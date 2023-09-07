@@ -101,7 +101,13 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (docs, next) {
   // docs => all the documents returned from the query
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
-  console.log(docs);
+  next();
+});
+
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  // this points to the current aggregation object
+  console.log(this.pipeline());
   next();
 });
 

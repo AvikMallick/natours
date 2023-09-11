@@ -55,6 +55,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // setting time to 1 second past, because sometimes jwt token is created a bit before this passwordChangedAt property is saved in the DB.
+  // in that case we won't be able to log in the user as the passwordCreatedAt is used for creating jwt token by checking if user changed
+  // password after the token was issued
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
